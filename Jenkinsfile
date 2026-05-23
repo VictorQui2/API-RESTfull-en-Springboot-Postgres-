@@ -40,6 +40,7 @@ pipeline {
                 dir(APP_DIR) {
                     bat 'docker compose down --remove-orphans'
                 }
+                bat 'docker rm -f dockerbdcalendario dockerapicalendario 2>nul & exit /b 0'
             }
         }
 
