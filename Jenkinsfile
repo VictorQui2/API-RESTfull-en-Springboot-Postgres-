@@ -21,12 +21,12 @@ pipeline {
         stage('Crear Red Docker') {
             steps {
                 script {
-                    def existe = sh(
-                        script: "docker network ls --filter name=${NETWORK_NAME} --format '{{.Name}}' | grep -w ${NETWORK_NAME}",
+                    def existe = bat(
+                        script: "docker network ls --filter name=${NETWORK_NAME} --format \"{{.Name}}\" | findstr /w \"${NETWORK_NAME}\"",
                         returnStatus: true
                     )
                     if (existe != 0) {
-                        sh "docker network create ${NETWORK_NAME}"
+                        bat "docker network create ${NETWORK_NAME}"
                         echo "Red '${NETWORK_NAME}' creada."
                     } else {
                         echo "Red '${NETWORK_NAME}' ya existe."
@@ -38,7 +38,7 @@ pipeline {
         stage('Detener Contenedores Anteriores') {
             steps {
                 dir(APP_DIR) {
-                    sh 'docker compose down --remove-orphans'
+                    bat 'docker compose down --remove-orphans'
                 }
             }
         }
@@ -46,7 +46,7 @@ pipeline {
         stage('Construir Imagen Docker') {
             steps {
                 dir(APP_DIR) {
-                    sh 'docker compose build --no-cache'
+                    bat 'docker compose build --no-cache'
                 }
             }
         }
@@ -54,7 +54,7 @@ pipeline {
         stage('Desplegar Contenedores') {
             steps {
                 dir(APP_DIR) {
-                    sh 'docker compose up -d'
+                    bat 'docker compose up -d'
                 }
             }
         }
@@ -62,7 +62,7 @@ pipeline {
         stage('Verificar Estado') {
             steps {
                 dir(APP_DIR) {
-                    sh 'docker compose ps'
+                    bat 'docker compose ps'
                 }
             }
         }
@@ -76,7 +76,7 @@ pipeline {
         failure {
             echo 'Error en el despliegue de apiCalendario. Revisando logs...'
             dir(APP_DIR) {
-                sh 'docker compose logs --tail=50'
+                bat 'docker compose logs --tail=50'
             }
         }
     }
